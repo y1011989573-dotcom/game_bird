@@ -466,6 +466,7 @@ defineExpose({
   animation: pulse 0.5s ease-in-out;
 }
 
+
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
