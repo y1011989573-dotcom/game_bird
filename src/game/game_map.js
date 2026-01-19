@@ -9,6 +9,7 @@ class api {
 
 	getByPos = (pos) => request('game_map', 'get_by_pos', {pos})
 
+	switchMap = (map_id) => request('game_map', 'switch_map', {map_id})
 
 }
 

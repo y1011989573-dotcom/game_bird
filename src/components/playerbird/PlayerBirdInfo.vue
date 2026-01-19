@@ -99,13 +99,13 @@
 				<el-button type="primary" @click="vis = false">关闭</el-button>
 				<div class="flex flex-wrap gap-2">
 					<el-button type="info" @click="showExpCardSelection">使用经验卡</el-button>
-					<el-button type="success" @click="handleSell" :disabled="bird?.status !== null">
+					<el-button type="success" @click="handleSell" :disabled="!!bird?.status">
 						{{ bird?.status ? '无法出售' : '出售' }}
 					</el-button>
 					<el-button
 						type="danger"
 						@click="handleReincarnate"
-						:disabled="bird?.status !== null || (bird?.lv || 1) < 100"
+						:disabled="(bird?.lv || 1) < 100"
 					>
 						{{ bird?.lv >= 100 ? '转生' : `转生(${bird?.lv || 1}/100)` }}
 					</el-button>
@@ -316,11 +316,6 @@ const handleSell = async () => {
 // 转生
 const handleReincarnate = async () => {
 	if (!bird.value) return
-
-	if (bird.value.status) {
-		ElMessage.warning('该鸟正在使用中，无法转生')
-		return
-	}
 
 	if ((bird.value.lv || 1) < 100) {
 		ElMessage.warning('该鸟未达到100级，无法转生')

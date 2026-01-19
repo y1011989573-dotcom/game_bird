@@ -102,7 +102,7 @@
 </template>
 
 <script setup>
-import {ref, inject} from 'vue'
+import {inject, ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {getImageUrl} from '@/config/oss'
 
@@ -144,6 +144,52 @@ const show = async (opponent) => {
 	vis.value = true
 }
 
+// 格式化效果描述
+const formatEffect = (effect, targetName) => {
+	switch (effect.effectType) {
+		case 'weight_add':
+			return `${targetName}体重${effect.value > 0 ? '+' : ''}${effect.value.toFixed(2)}kg`
+		case 'weight_multiply':
+			return `${targetName}体重${effect.value > 0 ? '+' : ''}${effect.value}%`
+		case 'restraint_add':
+			return `${targetName}克制值${effect.value > 0 ? '+' : ''}${effect.value}`
+		case 'type_change':
+			return `${targetName}类型变为${effect.value}`
+		case 'instant_kill':
+			return `${targetName}被即死`
+		case 'immunity':
+			return `${targetName}获得免疫`
+		default:
+			return `产生了效果`
+	}
+}
+
+// 生成技能触发日志
+const generateSkillLogs = (skillLogs) => {
+	if (!skillLogs || skillLogs.length === 0) return ''
+
+  return skillLogs.map(log => {
+    const ownerName = log.owner.bird_name
+    const skillName = log.skill.name
+    const ownerColor = log.owner.side === 'challenger' ? 'blue' : 'red'
+
+    // 生成效果描述
+    const effectTexts = log.effects.map(effect => {
+      const targetName = log.targets.find(
+          t => t.slot === effect.targetSlot && t.side === effect.targetSide
+      )?.bird_name || '目标'
+
+      return formatEffect(effect, targetName)
+    }).join('，')
+
+    return `<div class="skill-trigger">
+			<span class="bird-name ${ownerColor}">${ownerName}</span>
+			触发了 <span class="skill-name">${skillName}</span>
+			${effectTexts ? `：${effectTexts}` : ''}
+		</div>`
+  }).join('')
+}
+
 // 生成战斗文字描述(带HTML颜色)
 const generateBattleText = (log) => {
 	const challengerBirdName = log.challenger.bird_name
@@ -174,17 +220,20 @@ const generateBattleText = (log) => {
 	}
 	const targetSkillText = targetSkills.join('')
 
+	// 生成技能触发日志
+	const skillLogsHtml = generateSkillLogs(log.skill_logs)
+
 	if (log.winner === 'challenger') {
 		// 我方胜利
 		const weightChange = (log.challenger.weight_before - log.challenger.weight_after).toFixed(2)
-		return `<span class="bird-name blue">${challengerBirdName}</span>${challengerSkillText}<span class="bird-weight">(${challengerWeight}kg)</span> 对战 <span class="bird-name red">${targetBirdName}</span>${targetSkillText}<span class="bird-weight">(${targetWeight}kg)</span> <span class="result-win">（胜利）</span> <span class="weight-change">（体重-${weightChange}kg）</span> <span class="bird-down red">（对方${targetBirdName}下场）</span>`
+		return `${skillLogsHtml}<span class="bird-name blue">${challengerBirdName}</span>${challengerSkillText}<span class="bird-weight">(${challengerWeight}kg)</span> 对战 <span class="bird-name red">${targetBirdName}</span>${targetSkillText}<span class="bird-weight">(${targetWeight}kg)</span> <span class="result-win">（胜利）</span> <span class="weight-change">（体重-${weightChange}kg）</span> <span class="bird-down red">（对方${targetBirdName}下场）</span>`
 	} else if (log.winner === 'target') {
 		// 对方胜利
 		const targetWeightChange = (log.target.weight_before - log.target.weight_after).toFixed(2)
-		return `<span class="bird-name blue">${challengerBirdName}</span>${challengerSkillText}<span class="bird-weight">(${challengerWeight}kg)</span> 对战 <span class="bird-name red">${targetBirdName}</span>${targetSkillText}<span class="bird-weight">(${targetWeight}kg)</span> <span class="result-lose">（失败）</span> <span class="weight-change">（体重-${targetWeightChange}kg）</span> <span class="bird-down blue">（我方${challengerBirdName}下场）</span>`
+		return `${skillLogsHtml}<span class="bird-name blue">${challengerBirdName}</span>${challengerSkillText}<span class="bird-weight">(${challengerWeight}kg)</span> 对战 <span class="bird-name red">${targetBirdName}</span>${targetSkillText}<span class="bird-weight">(${targetWeight}kg)</span> <span class="result-lose">（失败）</span> <span class="weight-change">（体重-${targetWeightChange}kg）</span> <span class="bird-down blue">（我方${challengerBirdName}下场）</span>`
 	} else {
 		// 平局
-		return `<span class="bird-name blue">${challengerBirdName}</span>${challengerSkillText}<span class="bird-weight">(${challengerWeight}kg)</span> 对战 <span class="bird-name red">${targetBirdName}</span>${targetSkillText}<span class="bird-weight">(${targetWeight}kg)</span> <span class="result-draw">（平局）</span> <span class="bird-down gray">（双方下场）</span>`
+		return `${skillLogsHtml}<span class="bird-name blue">${challengerBirdName}</span>${challengerSkillText}<span class="bird-weight">(${challengerWeight}kg)</span> 对战 <span class="bird-name red">${targetBirdName}</span>${targetSkillText}<span class="bird-weight">(${targetWeight}kg)</span> <span class="result-draw">（平局）</span> <span class="bird-down gray">（双方下场）</span>`
 	}
 }
 
@@ -663,5 +712,21 @@ defineExpose({
 	background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 	color: white;
 	box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+}
+
+/* 技能触发日志样式 */
+.battle-text :deep(.skill-trigger) {
+	background: #f0f9ff;
+	border-left: 3px solid #3b82f6;
+	padding: 6px 10px;
+	margin: 4px 0;
+	font-size: 13px;
+	color: #1e293b;
+}
+
+.battle-text :deep(.skill-trigger .skill-name) {
+	color: #8b5cf6;
+	font-weight: 600;
+	padding: 0 4px;
 }
 </style>
