@@ -22,7 +22,7 @@
 					</div>
 
 					<!-- 爱心图标 -->
-					<div class="text-3xl">💖</div>
+					<div class="text-3xl relative -top-4">💖</div>
 
 					<!-- 配偶头像 -->
 					<div class="flex flex-col items-center">
@@ -77,13 +77,9 @@
 								:src="getImageUrl('bird', friendNest.player_bird_1.game_bird?.nickname)"
 								class="border-2 border-blue-400"
 						/>
-						<el-avatar
-								v-else
-								:size="70"
-								class="border-2 border-gray-300 bg-gray-50"
-						>
-							<span class="text-3xl text-gray-400">📭</span>
-						</el-avatar>
+					<el-avatar v-else :size="70" class="border-2 border-gray-300 bg-gray-50">
+  						<img :src="nestPlaceholder" class="slot-icon" alt="巢穴" />
+					</el-avatar>
 						<div class="text-xs mt-1" v-if="friendNest.player_bird_1">
 							{{ friendNest.player_bird_1.game_bird?.nickname }} {{ friendNest.player_bird_1.sex === 0 ? '♂' : '♀' }} {{ friendNest.player_bird_1.weight.toFixed(2) }}kg
 						</div>
@@ -93,9 +89,21 @@
 						<div class="text-xs mt-1 text-gray-400" v-else>位置1</div>
 					</div>
 
-					<!-- 爱心图标 -->
-					<div class="text-3xl" v-if="friendNest.is_pairing">💕</div>
-					<div class="text-3xl text-gray-300" v-else>💙</div>
+					<!-- 中间图标：显示“对方(好友)使用的巢穴” -->
+					<div class="flex items-center justify-center w-20 h-20">
+					<img
+						v-if="friendNest?.game_item_nest"
+						:src="getImageUrl('nest', friendNest.game_item_nest.nickname)"
+						class="nest-heart"
+						alt="对方巢穴"
+					/>
+					<img
+						v-else
+						:src="nestPlaceholder"
+						class="nest-heart"
+						alt="巢穴"
+					/>
+					</div>
 
 					<!-- 位置2   -->
 					<div class="flex flex-col items-center cursor-pointer"
@@ -109,12 +117,8 @@
 									:src="getImageUrl('bird', friendNest.player_bird_2.game_bird?.nickname)"
 									class="border-2 border-pink-400"
 							/>
-							<el-avatar
-									v-else
-									:size="70"
-									class="border-2 border-gray-300 bg-gray-50"
-							>
-								<span class="text-3xl text-gray-400">➕</span>
+							<el-avatar v-else :size="70" class="border-2 border-gray-300 bg-gray-50">
+								<img :src="nestPlaceholder" class="slot-icon" alt="巢穴" />
 							</el-avatar>
 						</div>
 						<div class="text-xs mt-1" v-if="friendNest.player_bird_2">
@@ -213,6 +217,7 @@
 </template>
 
 <script setup>
+import nestPlaceholder from '../home/nest_placeholder.png'
 import {ref, inject} from 'vue'
 import { message } from '@/game/notification-center'
 import {getImageUrl} from '@/config/oss'
@@ -368,4 +373,28 @@ const handleBirdSelect = async (bird) => {
 </script>
 
 <style scoped>
+.nest-heart {
+  width: 70px;     
+  height: 70px;    
+  object-fit: cover;
+  display: block;
+
+  transform: translateY(-6px);
+
+  /* 心形裁剪：mask  */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M256 464s-40-28-80-64C96 336 32 272 32 192 32 123 83 72 152 72c39 0 72 20 104 56 32-36 65-56 104-56 69 0 120 51 120 120 0 80-64 144-144 208-40 36-80 64-80 64z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M256 464s-40-28-80-64C96 336 32 272 32 192 32 123 83 72 152 72c39 0 72 20 104 56 32-36 65-56 104-56 69 0 120 51 120 120 0 80-64 144-144 208-40 36-80 64-80 64z'/%3E%3C/svg%3E");
+
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  -webkit-mask-size: contain;
+  mask-size: contain;
+
+  -webkit-mask-position: center;
+  mask-position: center;
+
+  /*加一点圆润/投影更像按钮 */
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.18));
+}
 </style>

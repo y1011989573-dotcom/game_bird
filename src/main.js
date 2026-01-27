@@ -11,13 +11,14 @@ import VConsole from 'vconsole'
 // 初始化 vConsole（移动端调试工具）
 new VConsole()
 
-const app = createApp(App)
-app.use(ElementPlus)
-app.provide('game', game)
-app.mount('#app')
+  // 2) 再创建并挂载应用
+  const app = createApp(App)
+  app.use(ElementPlus)
+  app.provide('game', game)
+  app.mount('#app')
 
 // 启动版本检测（每5分钟检查一次）
-checkVersion()
+  checkVersion()
 
 // 注册训练被偷取通知监听器
 game.notificationCenter.on('player_train', 'training_stolen', (wsMessage) => {

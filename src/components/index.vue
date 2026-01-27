@@ -1,8 +1,9 @@
 <template>
 	<el-card class="min-h-screen w-full" :body-style="{ padding: 0 }">
 		<!-- 横幅图片 -->
-		<div class="h-48 flex items-center justify-center bg-center bg-cover"
-			 style="background-image:url('https://bird.cn-nb1.rains3.com/img/bg/bird_game_big.png');">
+		<div
+  			class="h-48 flex items-center justify-center bg-center bg-cover"
+  			:style="{ backgroundImage: `url(${getImageUrl('bg', 'bird_game', '_big')})` }">
 		</div>
 
 		<!-- 文字简介 -->
@@ -60,6 +61,8 @@
 <script setup>
 import {ref, inject, onMounted, watch, onUnmounted} from 'vue'
 import {User, Lock} from '@element-plus/icons-vue'
+import { getImageUrl } from '@/config/oss'
+
 import { ElCheckbox} from 'element-plus'
 import { message } from '@/game/notification-center'
 
