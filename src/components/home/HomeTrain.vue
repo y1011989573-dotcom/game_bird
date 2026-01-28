@@ -6,45 +6,66 @@
 
   <el-card v-for="player_train in game.player_train.data" shadow="never" bodyClass="flex flex-col p-0!">
     <!-- 上部分：图片和信息 -->
-    <div class="flex p-2!">
-      <!-- 左侧：圆形头像和名称 -->
-      <div class="flex flex-col items-center p-2">
-        <el-avatar :size="64" :src="player_train?.player_bird ? getImageUrl('bird', player_train.player_bird.game_bird?.nickname) : getImageUrl('item', player_train?.game_item_train?.nickname )">
-
-        </el-avatar>
-        <div class="text-xs text-center mt-1 max-w-20 truncate">
-          {{ player_train?.player_bird ? player_train.player_bird.game_bird?.nickname : (player_train?.game_item_train ? player_train.game_item_train.nickname : player_train?.nickname) }}
-        </div>
-      </div>
-      <!-- 右侧：信息和倒计时 -->
-      <div class="flex flex-1 p-2! justify-between items-center  border-gray-200">
-        <!-- 倒计时 -->
-        <div class="flex gap-2">
-          <el-countdown
-              v-if="player_train?.player_bird_id && player_train?.start_time"
-              :value="get_train_deadline(player_train)"
-              format="HH:mm:ss"
-              :title="player_train?.game_item_train?.nickname || player_train?.nickname"
-              :title-style="{ fontSize: '12px', color: '#409EFF' }"
-              :value-style="{ fontSize: '14px', color: '#409EFF', fontWeight: 'bold' }"
+      <div class="train-top p-2!">
+        <!-- 左：训练场（方图 + 名字 + 橙色时间） -->
+        <div class="train-left">
+        <div class="train-square">
+          <img
+            :src="player_train?.game_item_train
+              ? getImageUrl('train', player_train.game_item_train.nickname, )
+              : normalTrainImg"
           />
-          <el-tag v-else type="info" size="small">未开始训练</el-tag>
-          <el-countdown
-              v-if="get_train_time_remaining(player_train)"
+        </div>
+
+        <div class="train-left-text">
+          <div class="train-title">
+            {{ player_train?.game_item_train ? player_train.game_item_train.nickname : '普通训练场' }}
+          </div>
+
+          <!-- 橙色时间：默认 ∞，更换训练场后用原有倒计时逻辑 -->
+          <div class="train-orange">
+            <el-countdown
+              v-if="player_train?.game_item_train && get_train_time_remaining(player_train)"
               :value="get_item_deadline(player_train)"
               format="HH:mm:ss"
-              title="道具倒计时"
-              :title-style="{ fontSize: '12px', color: '#E6A23C' }"
               :value-style="{ fontSize: '14px', color: '#E6A23C', fontWeight: 'bold' }"
-          />
+            />
+            <span v-else class="train-infinite">∞:∞:∞</span>
+          </div>
         </div>
+      </div>
+
+      <!-- 中：鸟（圆图 + 名字；未选显示第四张图+“请选择鸟”） -->
+      <div class="train-middle">
+        <el-avatar
+          :size="64"
+          :src="player_train?.player_bird
+            ? getImageUrl('bird', player_train.player_bird.game_bird?.nickname)
+            : normalTrainBirdImg"
+        />
+        <div class="train-bird-name">
+          {{ player_train?.player_bird ? player_train.player_bird.game_bird?.nickname : '请选择鸟' }}
+        </div>
+      </div>
+
+      <!-- 右侧：信息和倒计时 -->
+      <div class="train-right">
+        <div class="train-right-title">训练倒计时</div>
+
+        <el-countdown
+          v-if="player_train?.player_bird_id && player_train?.start_time"
+          :value="get_train_deadline(player_train)"
+          format="HH:mm:ss"
+          :value-style="{ fontSize: '14px', color: '#409EFF', fontWeight: 'bold' }"
+        />
+        <el-tag v-else type="info" size="small">未开始训练</el-tag>
         <!-- 偷取和剩余信息 -->
-        <div v-if="get_train_minutes(player_train) >= 240" class="text-xs text-gray-600">
+        <div v-if="get_train_minutes(player_train) >= 240" 
+          class="text-xs text-gray-600 relative -left-6">
           被偷: {{ get_stolen_cards(player_train) }} | 剩余: {{ get_remaining_cards(player_train) }}
         </div>
       </div>
     </div>
-
 
     <hr class="border-gray-200"/>
     <!-- 下部分：按钮区域（独立） -->
@@ -119,6 +140,9 @@ import {inject, onMounted, onUnmounted, onActivated, onDeactivated, ref} from "v
 import { message } from '@/game/notification-center';
 import BirdSelector from '../common/BirdSelector.vue'
 import {getImageUrl} from '@/config/oss'
+import normalTrainImg from './normal_train.png'
+import normalTrainBirdImg from './normal_train_bird.png'
+
 
 const game = inject('game')
 const vis_bird_list = ref(false)
@@ -322,6 +346,98 @@ onDeactivated(() => {
 </script>
 
 <style scoped>
+.train-top{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 让中间区域占满左右之间的空白，并把内容居中 */
+.train-middle{
+  flex: 1;                 
+  display: flex;
+  flex-direction: column;
+  align-items: center;     
+  text-align: center;
+}
+
+/* 左边：训练场（方图 + 右侧文字） */
+.train-left{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 180px;
+}
+
+.train-square{
+  width: 72px;
+  height: 72px;
+  border-radius: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+.train-square-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.train-right{
+  margin-left: auto;          
+  display: flex;
+  flex-direction: column;
+  align-items: center;        
+  gap: 6px;
+  min-width: 140px;
+}
+
+.train-left-text{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.train-title{
+  font-size: 14px;
+}
+
+.train-infinite{
+  font-size: 14px;
+  font-weight: 700;
+  color: #E6A23C;
+}
+
+/* 中间：鸟 */
+.train-middle{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.train-bird-name{
+  font-size: 14px;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 右边：训练倒计时 */
+.train-right{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.train-right-title{
+  font-size: 14px;
+}
 
 
 </style>
