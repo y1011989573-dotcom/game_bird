@@ -78,7 +78,7 @@
 								class="border-2 border-blue-400"
 						/>
 					<el-avatar v-else :size="70" class="border-2 border-gray-300 bg-gray-50">
-  						<img :src="nestPlaceholder" class="slot-icon" alt="巢穴" />
+  						<img :src="nestPlaceholder2" class="slot-icon" alt="巢穴" />
 					</el-avatar>
 						<div class="text-xs mt-1" v-if="friendNest.player_bird_1">
 							{{ friendNest.player_bird_1.game_bird?.nickname }} {{ friendNest.player_bird_1.sex === 0 ? '♂' : '♀' }} {{ friendNest.player_bird_1.weight.toFixed(2) }}kg
@@ -99,7 +99,7 @@
 					/>
 					<img
 						v-else
-						:src="normalNestImg"
+						:src="nestplaceholder1"
 						class="nest-heart"
 						alt="巢穴"
 					/>
@@ -118,7 +118,7 @@
 									class="border-2 border-pink-400"
 							/>
 							<el-avatar v-else :size="70" class="border-2 border-gray-300 bg-gray-50">
-								<img :src="nestPlaceholder" class="slot-icon" alt="巢穴" />
+								<img :src="nestPlaceholder2" class="slot-icon" alt="巢穴" />
 							</el-avatar>
 						</div>
 						<div class="text-xs mt-1" v-if="friendNest.player_bird_2">
@@ -153,11 +153,13 @@
 			<div class="flex justify-center mt-2 mb-4">
 				<span class="font-bold text-sm text-gray-700">训练场</span>
 			</div>
-
+			<!-- 显示好友训练场 -->
 			<div class="px-4 pb-4 space-y-3">
 				<div v-for="train in friendTrains" :key="train.id" class=" p-3! rounded">
 					<div class="mb-2">
-						<span class="text-sm font-bold text-blue-600">{{ train.nickname }}</span>
+						<span class="text-sm font-bold text-blue-600 relative left-2 -top-1">
+							{{ train.game_item_train?.nickname || train.nickname }}
+						</span>
 					</div>
 
 					<div v-if="train.player_bird" class="flex items-center gap-3">
@@ -217,8 +219,8 @@
 </template>
 
 <script setup>
-import nestPlaceholder from '../home/nest_placeholder.png'
-import normalNestImg from '../home/normal_nest.png'
+import nestPlaceholder2 from '../home/nest_placeholder2.png'
+import nestplaceholder1 from '../home/nest_Placeholder1.png'
 import {ref, inject} from 'vue'
 import { message } from '@/game/notification-center'
 import {getImageUrl} from '@/config/oss'

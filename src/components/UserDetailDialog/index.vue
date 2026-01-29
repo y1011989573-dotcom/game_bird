@@ -104,7 +104,7 @@
 					</el-button>
 				</div>
 			<!-- 查看工会按钮 -->
-			<el-button v-if="playerGuild" type="info" @click="handleViewGuild">
+			<el-button v-if="playerGuild" type="warning" @click="handleViewGuild">
 				🏰 查看工会
 			</el-button>
 		</div>
@@ -340,4 +340,5 @@ defineExpose({
 		transform: rotate(360deg);
 	}
 }
+
 </style>

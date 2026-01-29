@@ -58,7 +58,7 @@
 							class="border-2 border-blue-400"
 						/>
 						<el-avatar v-else :size="70" class="border-2 border-gray-300 bg-gray-50">
-							<img :src="nestPlaceholder" class="slot-icon" alt="巢穴" />
+							<img :src="nestPlaceholder2" class="slot-icon" alt="巢穴" />
 						</el-avatar>
 					</div>
 					<div class="text-xs mt-1" v-if="game.player_nest.data?.player_bird_1">
@@ -86,7 +86,7 @@
 							class="border-2 border-pink-400"
 						/>
 						<el-avatar v-else :size="70" class="border-2 border-gray-300 bg-gray-50">
-							<img :src="nestPlaceholder" class="slot-icon" alt="巢穴" />
+							<img :src="nestPlaceholder2" class="slot-icon" alt="巢穴" />
 						</el-avatar>
 					</div>
 					<div class="text-xs mt-1" v-if="game.player_nest.data?.player_bird_2">
@@ -162,8 +162,8 @@
 </template>
 
 <script setup>
-import defaultNestImg from './normal_nest.png'
-import nestPlaceholder from './nest_placeholder.png'
+import nestPlaceholder1 from './nest_placeholder1.png'
+import nestPlaceholder2 from './nest_placeholder2.png'
 import {inject, onMounted, onUnmounted, onActivated, onDeactivated,ref, computed} from "vue";
 import {message} from '@/game/notification-center'
 import {getImageUrl} from '@/config/oss'
@@ -318,13 +318,13 @@ const get_nest_title = () => {
 const get_nest_image = () => {
   	const nest = game.player_nest.data
   	const nickname = nest?.game_item_nest?.nickname
-  	if (!nickname) return defaultNestImg
+  	if (!nickname) return nestPlaceholder1
   		try {
     	// 如果OSS/静态资源里有对应巢穴图片，优先用它
-    	return getImageUrl('nest', nickname) || defaultNestImg
+    	return getImageUrl('nest', nickname) || nestPlaceholder1
 		} 
 		catch (e) {
-    	return defaultNestImg
+    	return nestPlaceholder1
 	}
 }
 

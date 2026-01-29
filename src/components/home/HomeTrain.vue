@@ -13,7 +13,7 @@
           <img
             :src="player_train?.game_item_train
               ? getImageUrl('train', player_train.game_item_train.nickname, )
-              : normalTrainImg"
+              : normalTrainPlaceholder"
           />
         </div>
 
@@ -41,7 +41,7 @@
           :size="64"
           :src="player_train?.player_bird
             ? getImageUrl('bird', player_train.player_bird.game_bird?.nickname)
-            : normalTrainBirdImg"
+            : normalTrainBirdPlaceholder"
         />
         <div class="train-bird-name">
           {{ player_train?.player_bird ? player_train.player_bird.game_bird?.nickname : '请选择鸟' }}
@@ -140,8 +140,8 @@ import {inject, onMounted, onUnmounted, onActivated, onDeactivated, ref} from "v
 import { message } from '@/game/notification-center';
 import BirdSelector from '../common/BirdSelector.vue'
 import {getImageUrl} from '@/config/oss'
-import normalTrainImg from './normal_train.png'
-import normalTrainBirdImg from './normal_train_bird.png'
+import normalTrainPlaceholder from './normal_train.png'
+import normalTrainBirdPlaceholder from './normal_train_bird.png'
 
 
 const game = inject('game')

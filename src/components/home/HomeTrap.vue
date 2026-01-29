@@ -47,7 +47,8 @@
 					:src="player_trap?.selected_bird ? getImageUrl('bird', player_trap.selected_bird.nickname) : player_trap?.image_url"
 					:class="[' border-2', getTrapBorderClass(player_trap)]"
 				>
-					<span class="text-4xl">🪤</span>
+					<img :src="trapPlaceholder" class="slot-icon" alt="trap_placeholder" 
+					/>
 				</el-avatar>
 
 
@@ -154,6 +155,8 @@ import { message } from '@/game/notification-center';
 import {Lock} from '@element-plus/icons-vue';
 import {getImageUrl} from '@/config/oss'
 import PlayerBirdInfo from '@/components/playerbird/PlayerBirdInfo.vue'
+import trapPlaceholder from './normal_trap.png'
+
 
 const game = inject('game')
 const vis_item_bait = ref(false)
